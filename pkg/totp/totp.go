@@ -19,7 +19,7 @@ func TOTP(key []byte, t int64, period int, digitsCount int, mode Mode) (string, 
 		return "", fmt.Errorf("key length incorrect for mode %q", mode)
 	}
 	mac := hmac.New(sha1.New, key)
-	unixT := time.Unix(t,0).Unix() // TODO: Prob not needed...
+	unixT := time.Unix(t, 0).Unix() // TODO: Prob not needed...
 	t0 := unixT / int64(period)
 
 	message := make([]byte, 8)
@@ -28,14 +28,14 @@ func TOTP(key []byte, t int64, period int, digitsCount int, mode Mode) (string, 
 	mac.Write(message)
 	hm := mac.Sum(nil)
 
-	offset   :=  hm[19] & 0xf
+	offset := hm[19] & 0xf
 	binCode := []byte{
-		hm[offset]  & 0x7f,
+		hm[offset] & 0x7f,
 		hm[offset+1] & 0xff,
 		hm[offset+2] & 0xff,
-		hm[offset+3] & 0xff }
+		hm[offset+3] & 0xff}
 	code := binary.BigEndian.Uint32(binCode)
 
-	scode := strconv.FormatUint(uint64(code),10)
+	scode := strconv.FormatUint(uint64(code), 10)
 	return scode[len(scode)-digitsCount:], nil
 }

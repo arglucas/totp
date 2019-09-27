@@ -15,4 +15,3 @@ func main() {
 	code, _ := totp.TOTP(key, 59, 30, 8, totp.SHA1)
 	fmt.Println("TOTP Code: ", code)
 }
-
