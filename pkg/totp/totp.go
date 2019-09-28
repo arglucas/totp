@@ -3,7 +3,6 @@ package totp
 import (
 	"crypto/hmac"
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"strconv"
 	"time"
@@ -11,9 +10,6 @@ import (
 
 // TODO: Support other algorithms and extend digit support properly.
 func TOTP(key []byte, t int64, period int, digitsCount int, mode Mode) (string, error) {
-	if mode == SHA512 {
-		return "", errors.New("unsupported mode")
-	}
 	if mode.KeySize() != len(key) {
 		return "", fmt.Errorf("key length incorrect for mode %q", mode)
 	}

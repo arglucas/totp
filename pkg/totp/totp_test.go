@@ -5,12 +5,13 @@ import (
 )
 
 var tIn []int64
-var sha1Key, sha256Key string
+var sha1Key, sha256Key, sha512Key string
 
 func init() {
 	// Common Test Parameters
 	sha1Key = "12345678901234567890"
 	sha256Key = "12345678901234567890123456789012"
+	sha512Key = "1234567890123456789012345678901234567890123456789012345678901234"
 	//x := 30
 	//d := 8
 	tIn = []int64{59, 1111111109, 1111111111, 1234567890, 2000000000, 20000000000}
@@ -26,7 +27,7 @@ func TestSHA1(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		} else if totp != expected[i] {
-			t.Errorf("TOTP(%q) == %q, want %q", ti, totp, expected[i])
+			t.Errorf("TOTP(%d) == %q, want %q", ti, totp, expected[i])
 		}
 	}
 }
@@ -36,6 +37,19 @@ func TestSHA256(t *testing.T) {
 
 	for i, ti := range tIn {
 		totp, err := TOTP([]byte(sha256Key), ti, 30, 8, SHA256)
+		if err != nil {
+			t.Error(err)
+		} else if totp != expected[i] {
+			t.Errorf("TOTP(%d) == %q, want %q", ti, totp, expected[i])
+		}
+	}
+}
+
+func TestSHA512(t *testing.T) {
+	expected := []string{"90693936", "25091201", "99943326", "93441116", "38618901", "47863826"}
+
+	for i, ti := range tIn {
+		totp, err := TOTP([]byte(sha512Key), ti, 30, 8, SHA512)
 		if err != nil {
 			t.Error(err)
 		} else if totp != expected[i] {
