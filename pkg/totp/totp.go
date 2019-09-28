@@ -2,7 +2,6 @@ package totp
 
 import (
 	"crypto/hmac"
-	"crypto/sha1"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -12,13 +11,13 @@ import (
 
 // TODO: Support other algorithms and extend digit support properly.
 func TOTP(key []byte, t int64, period int, digitsCount int, mode Mode) (string, error) {
-	if mode != SHA1 {
+	if mode == SHA512 {
 		return "", errors.New("unsupported mode")
 	}
-	if mode == SHA1 && len(key) != 20 {
+	if mode.KeySize() != len(key) {
 		return "", fmt.Errorf("key length incorrect for mode %q", mode)
 	}
-	mac := hmac.New(sha1.New, key)
+	mac := hmac.New(mode.GetHash(), key)
 	unixT := time.Unix(t, 0).Unix() // TODO: Prob not needed...
 	t0 := unixT / int64(period)
 
@@ -28,7 +27,7 @@ func TOTP(key []byte, t int64, period int, digitsCount int, mode Mode) (string, 
 	mac.Write(message)
 	hm := mac.Sum(nil)
 
-	offset := hm[19] & 0xf
+	offset := hm[len(hm)-1] & 0xf
 	binCode := []byte{
 		hm[offset] & 0x7f,
 		hm[offset+1] & 0xff,
